@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-
 	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/mxngocqb/IoT-Project/config"
 	zerolog "github.com/rs/zerolog/log"
 )
 
@@ -36,4 +36,6 @@ func main() {
 
 		fmt.Println(res)
 	}
+
+	config.ConnectDatabase()
 }

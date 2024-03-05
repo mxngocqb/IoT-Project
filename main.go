@@ -1,8 +1,13 @@
 package main
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
 	"fmt"
+	"log"
 	"os"
+
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/mxngocqb/IoT-Project/config"
 	zerolog "github.com/rs/zerolog/log"

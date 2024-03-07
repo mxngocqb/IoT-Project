@@ -12,7 +12,7 @@ const (
 	port     = 5432
 	user     = "root"
 	password = "1"
-	dbName   = "northwind"
+	dbName   = "iot_project"
 )
 
 func ConnectDatabase() *gorm.DB {

@@ -1,15 +1,12 @@
 package main
 
 import (
-	"bytes"
-	"context"
-	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/mxngocqb/IoT-Project/config"
+	"github.com/mxngocqb/IoT-Project/repository/driver"
 	zerolog "github.com/rs/zerolog/log"
 )
 
@@ -18,7 +15,7 @@ var es *elasticsearch.Client
 func main() {
 	zerolog.Info().Msg("Server Started!")
 	var err error
-	
+
 	cert, _ := os.ReadFile("E:/elasticsearch-8.12.2-windows-x86_64/elasticsearch-8.12.2/config/certs/http_ca.crt")
 
 	cfg := elasticsearch.Config{
@@ -42,5 +39,7 @@ func main() {
 		fmt.Println(res)
 	}
 
-	config.ConnectDatabase()
+	db := config.ConnectDatabase()
+
+	driver.NewDriverRepository(db)
 }

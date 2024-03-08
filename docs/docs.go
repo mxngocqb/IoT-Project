@@ -16,6 +16,33 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/drivers": {
+            "get": {
+                "description": "Get all drivers from the database and returns them as JSON.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Driver"
+                ],
+                "summary": "Get all drivers",
+                "responses": {
+                    "200": {
+                        "description": "List of drivers",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DriverServerResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DriverServerResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "Create a new driver",
                 "consumes": [
@@ -25,7 +52,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "driver"
+                    "Driver"
                 ],
                 "summary": "Create a new driver",
                 "parameters": [
@@ -45,9 +72,122 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/drivers/{driverID}": {
+            "get": {
+                "description": "Retrieve a driver from the database by its ID and return it as JSON.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Driver"
+                ],
+                "summary": "Retrieve a driver by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Driver ID",
+                        "name": "driverID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Driver information",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DriverServerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DriverServerResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DriverServerResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DriverServerResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update information of a driver based on the provided data in JSON format.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Driver"
+                ],
+                "summary": "Update a driver",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Driver ID",
+                        "name": "driverID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Driver object to be updated",
+                        "name": "driver",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Driver"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated driver information",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DriverServerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DriverServerResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.DriverServerResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "controller.DriverServerResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Driver": {
             "type": "object",
             "required": [

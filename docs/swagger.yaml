@@ -1,5 +1,13 @@
 basePath: /
 definitions:
+  controller.DriverServerResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      status:
+        type: string
+    type: object
   model.Driver:
     properties:
       driver_id:
@@ -22,6 +30,24 @@ info:
   version: "1.0"
 paths:
   /drivers:
+    get:
+      consumes:
+      - application/json
+      description: Get all drivers from the database and returns them as JSON.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of drivers
+          schema:
+            $ref: '#/definitions/controller.DriverServerResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.DriverServerResponse'
+      summary: Get all drivers
+      tags:
+      - Driver
     post:
       consumes:
       - application/json
@@ -40,7 +66,76 @@ paths:
           description: OK
       summary: Create a new driver
       tags:
-      - driver
+      - Driver
+  /drivers/{driverID}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a driver from the database by its ID and return it as
+        JSON.
+      parameters:
+      - description: Driver ID
+        in: path
+        name: driverID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Driver information
+          schema:
+            $ref: '#/definitions/controller.DriverServerResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.DriverServerResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/controller.DriverServerResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.DriverServerResponse'
+      summary: Retrieve a driver by ID
+      tags:
+      - Driver
+    put:
+      consumes:
+      - application/json
+      description: Update information of a driver based on the provided data in JSON
+        format.
+      parameters:
+      - description: Driver ID
+        in: path
+        name: driverID
+        required: true
+        type: string
+      - description: Driver object to be updated
+        in: body
+        name: driver
+        required: true
+        schema:
+          $ref: '#/definitions/model.Driver'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated driver information
+          schema:
+            $ref: '#/definitions/controller.DriverServerResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.DriverServerResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/controller.DriverServerResponse'
+      summary: Update a driver
+      tags:
+      - Driver
 schemes:
 - http
 - https

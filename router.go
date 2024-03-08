@@ -10,9 +10,12 @@ import (
 func NewRouter(c *Controllers) *gin.Engine {
 	router := gin.Default()
 
-	customers := router.Group("/drivers")
+	drivers := router.Group("/drivers")
 	{
-		customers.POST("", c.DriverController.CreateDriver)
+		drivers.POST("", c.DriverController.CreateDriver)
+		drivers.GET("", c.DriverController.ReadAllDriver)
+		drivers.GET("/:driverID", c.DriverController.ReadDriverByID)
+		drivers.PUT("/:driverID", c.DriverController.UpdateDriver)
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

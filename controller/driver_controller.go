@@ -155,3 +155,34 @@ func (c *DriverController) UpdateDriver(ctx *gin.Context) {
 	ctx.Header("Content-Type", "application/json")
 	ctx.JSON(200, serverResponse)
 }
+
+// DeleteDriver deletes a driver by its ID.
+// @Summary Delete a driver
+// @Description Delete a driver from the database based on its ID.
+// @Tags Driver
+// @Accept json
+// @Produce json
+// @Param driverID path string true "Driver ID"
+// @Success 200 {object} DriverServerResponse "Driver deleted successfully"
+// @Failure 500 {object} DriverServerResponse "Internal Server Error"
+// @Router /drivers/{driverID} [delete]
+func (c *DriverController) DeleteDriver(ctx *gin.Context) {
+	log.Info().Msg("Deleting Driver")
+	DriverID := ctx.Param("driverID")
+	err := c.driverService.Delete(DriverID)
+	if err != nil {
+		ctx.JSON(500, DriverServerResponse{
+			Code:   http.StatusInternalServerError,
+			Status: "Internal Server Error",
+			Data:   "Nothing",
+		})
+		return
+	}
+	serverResponse := DriverServerResponse{
+		Code:   http.StatusOK,
+		Status: "OK",
+		Data:   "Nnothing",
+	}
+	ctx.Header("Content-Type", "application/json")
+	ctx.JSON(200, serverResponse)
+}

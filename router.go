@@ -16,6 +16,7 @@ func NewRouter(c *Controllers) *gin.Engine {
 		drivers.GET("", c.DriverController.ReadAllDriver)
 		drivers.GET("/:driverID", c.DriverController.ReadDriverByID)
 		drivers.PUT("/:driverID", c.DriverController.UpdateDriver)
+		drivers.DELETE("/:driverID", c.DriverController.DeleteDriver)
 	}
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))

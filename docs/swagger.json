@@ -1,0 +1,71 @@
+{
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a sample server for the IoT Project API.",
+        "title": "IoT Proecjt",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "172.18.53.136:8080",
+    "basePath": "/",
+    "paths": {
+        "/drivers": {
+            "post": {
+                "description": "Create a new driver",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "driver"
+                ],
+                "summary": "Create a new driver",
+                "parameters": [
+                    {
+                        "description": "driver object that needs to be added",
+                        "name": "driver",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Driver"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.Driver": {
+            "type": "object",
+            "required": [
+                "driver_id",
+                "driver_license"
+            ],
+            "properties": {
+                "driver_id": {
+                    "type": "integer"
+                },
+                "driver_license": {
+                    "type": "string"
+                },
+                "driver_name": {
+                    "type": "string"
+                },
+                "home_town": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

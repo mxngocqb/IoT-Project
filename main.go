@@ -10,8 +10,10 @@ import (
 	"github.com/mxngocqb/IoT-Project/config"
 	"github.com/mxngocqb/IoT-Project/controller"
 	"github.com/mxngocqb/IoT-Project/repository/driver"
-	// _ "github.com/mxngocqb/IoT-Project/docs"
+	"github.com/mxngocqb/IoT-Project/repository/vehicle"
+	"github.com/mxngocqb/IoT-Project/repository/nav_record"
 	driverservice "github.com/mxngocqb/IoT-Project/service/driver"
+	vehicleservice "github.com/mxngocqb/IoT-Project/service/vehicle"
 	zerolog "github.com/rs/zerolog/log"
 )
 
@@ -58,8 +60,15 @@ func main() {
 	driverService := driverservice.NewDriverService(driverRepository, validate)
 	driverController := controller.NewDriverController(driverService)
 
+	vehicleRepository := vehicle.NewVehicleRepository(db)
+	vehicleService := vehicleservice.NewVehicleService(vehicleRepository, validate)
+	vechileController := controller.NewVehicleController(vehicleService)
+
+	nav_record.NewNavRecordRepository(db)
+
 	controllers := &Controllers{
 		DriverController: driverController,
+		VehicleController: vechileController,
 	}
 
 	routes := NewRouter(controllers)
@@ -68,10 +77,10 @@ func main() {
 		Addr:    ":8080",
 		Handler: routes,
 	}
-	
+
 	err = server.ListenAndServe()
 	if err != nil {
 		zerolog.Fatal().Err(err).Msg("Server Stopped")
 	}
-	
+
 }

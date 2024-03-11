@@ -19,6 +19,15 @@ func NewRouter(c *Controllers) *gin.Engine {
 		drivers.DELETE("/:driverID", c.DriverController.DeleteDriver)
 	}
 
+	vehicles := router.Group("/vehicles")
+	{
+		vehicles.POST("", c.VehicleController.CreateVehicle)
+		vehicles.GET("", c.VehicleController.ReadAllVehicle)
+		vehicles.GET("/:vehicleID", c.VehicleController.ReadVehicleByID)
+		vehicles.PUT("/:vehicleID", c.VehicleController.UpdateVehicle)
+		vehicles.DELETE("/:vehicleID", c.VehicleController.DeleteVehicle)
+	}
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router

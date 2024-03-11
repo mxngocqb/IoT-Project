@@ -44,7 +44,7 @@ func (c *DriverController) CreateDriver(ctx *gin.Context) {
 	driver, er := c.driverService.Create(&createDriver)
 
 	if er != nil {
-		ctx.JSON(500, gin.H{"error": err.Error()})
+		ctx.JSON(500, gin.H{"error": er.Error()})
 		return
 	}
 

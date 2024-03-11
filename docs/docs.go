@@ -209,10 +209,204 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/vehicles": {
+            "get": {
+                "description": "Retrieve all vehicles stored in the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vehicle"
+                ],
+                "summary": "Retrieve all vehicles",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/controller.VehicleServerResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.VehicleServerResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an existing vehicle with the provided information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vehicle"
+                ],
+                "summary": "Update a vehicle",
+                "parameters": [
+                    {
+                        "description": "Vehicle information",
+                        "name": "vehicle",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Vehicle"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/controller.VehicleServerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.VehicleServerResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.VehicleServerResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new vehicle with the provided information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vehicle"
+                ],
+                "summary": "Create a new vehicle",
+                "parameters": [
+                    {
+                        "description": "Vehicle information",
+                        "name": "vehicle",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Vehicle"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/controller.VehicleServerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/controller.VehicleServerResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.VehicleServerResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/vehicles/{vehicleID}": {
+            "get": {
+                "description": "Retrieve a vehicle from the database by its unique identifier",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vehicle"
+                ],
+                "summary": "Retrieve a vehicle by its ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Vehicle ID",
+                        "name": "vehicleID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/controller.VehicleServerResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.VehicleServerResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a vehicle from the database by its ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Vehicle"
+                ],
+                "summary": "Delete a vehicle",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Vehicle ID",
+                        "name": "vehicleID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "$ref": "#/definitions/controller.VehicleServerResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/controller.VehicleServerResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
         "controller.DriverServerResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "controller.VehicleServerResponse": {
             "type": "object",
             "properties": {
                 "code": {
@@ -241,6 +435,24 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "home_town": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Vehicle": {
+            "type": "object",
+            "required": [
+                "vehicle_id",
+                "vehicle_plate"
+            ],
+            "properties": {
+                "vehicle_id": {
+                    "type": "integer"
+                },
+                "vehicle_name": {
+                    "type": "string"
+                },
+                "vehicle_plate": {
                     "type": "string"
                 }
             }

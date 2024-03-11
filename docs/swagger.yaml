@@ -8,6 +8,14 @@ definitions:
       status:
         type: string
     type: object
+  controller.VehicleServerResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      status:
+        type: string
+    type: object
   model.Driver:
     properties:
       driver_id:
@@ -21,6 +29,18 @@ definitions:
     required:
     - driver_id
     - driver_license
+    type: object
+  model.Vehicle:
+    properties:
+      vehicle_id:
+        type: integer
+      vehicle_name:
+        type: string
+      vehicle_plate:
+        type: string
+    required:
+    - vehicle_id
+    - vehicle_plate
     type: object
 host: 172.18.53.136:8080
 info:
@@ -160,6 +180,126 @@ paths:
       summary: Update a driver
       tags:
       - Driver
+  /vehicles:
+    get:
+      description: Retrieve all vehicles stored in the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            $ref: '#/definitions/controller.VehicleServerResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/controller.VehicleServerResponse'
+      summary: Retrieve all vehicles
+      tags:
+      - Vehicle
+    post:
+      consumes:
+      - application/json
+      description: Create a new vehicle with the provided information
+      parameters:
+      - description: Vehicle information
+        in: body
+        name: vehicle
+        required: true
+        schema:
+          $ref: '#/definitions/model.Vehicle'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            $ref: '#/definitions/controller.VehicleServerResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/controller.VehicleServerResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/controller.VehicleServerResponse'
+      summary: Create a new vehicle
+      tags:
+      - Vehicle
+    put:
+      consumes:
+      - application/json
+      description: Update an existing vehicle with the provided information
+      parameters:
+      - description: Vehicle information
+        in: body
+        name: vehicle
+        required: true
+        schema:
+          $ref: '#/definitions/model.Vehicle'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            $ref: '#/definitions/controller.VehicleServerResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/controller.VehicleServerResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/controller.VehicleServerResponse'
+      summary: Update a vehicle
+      tags:
+      - Vehicle
+  /vehicles/{vehicleID}:
+    delete:
+      description: Delete a vehicle from the database by its ID
+      parameters:
+      - description: Vehicle ID
+        in: path
+        name: vehicleID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            $ref: '#/definitions/controller.VehicleServerResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/controller.VehicleServerResponse'
+      summary: Delete a vehicle
+      tags:
+      - Vehicle
+    get:
+      description: Retrieve a vehicle from the database by its unique identifier
+      parameters:
+      - description: Vehicle ID
+        in: path
+        name: vehicleID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            $ref: '#/definitions/controller.VehicleServerResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/controller.VehicleServerResponse'
+      summary: Retrieve a vehicle by its ID
+      tags:
+      - Vehicle
 schemes:
 - http
 - https

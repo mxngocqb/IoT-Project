@@ -7,11 +7,12 @@ import (
 
 	"github.com/elastic/go-elasticsearch/v8"
 	"github.com/go-playground/validator/v10"
+	"github.com/mxngocqb/IoT-Project/cache"
 	"github.com/mxngocqb/IoT-Project/config"
 	"github.com/mxngocqb/IoT-Project/controller"
 	"github.com/mxngocqb/IoT-Project/repository/driver"
-	"github.com/mxngocqb/IoT-Project/repository/vehicle"
 	"github.com/mxngocqb/IoT-Project/repository/nav_record"
+	vehicle "github.com/mxngocqb/IoT-Project/repository/vehicle"
 	driverservice "github.com/mxngocqb/IoT-Project/service/driver"
 	vehicleservice "github.com/mxngocqb/IoT-Project/service/vehicle"
 	zerolog "github.com/rs/zerolog/log"
@@ -22,7 +23,7 @@ var es *elasticsearch.Client
 // @title IoT Proecjt
 // @version 1.0
 // @description This is a sample server for the IoT Project API.
-// @host 172.18.53.136:8080
+// @host 192.168.88.132:9090
 // @BasePath /
 // @schemes http https
 
@@ -54,11 +55,18 @@ func main() {
 	}
 
 	db := config.ConnectDatabase()
+	redisConfig := config.NewRedisConfig()
+	redisClient, err := config.ConnectRedis(redisConfig)
+	if err != nil {
+		panic(err)
+	}
+
 	validate := validator.New()
 
 	driverRepository := driver.NewDriverRepository(db)
 	driverService := driverservice.NewDriverService(driverRepository, validate)
-	driverController := controller.NewDriverController(driverService)
+	driverCache := cache.NewDriverRedisCache(redisClient)
+	driverController := controller.NewDriverController(driverService, driverCache)
 
 	vehicleRepository := vehicle.NewVehicleRepository(db)
 	vehicleService := vehicleservice.NewVehicleService(vehicleRepository, validate)
@@ -67,14 +75,14 @@ func main() {
 	nav_record.NewNavRecordRepository(db)
 
 	controllers := &Controllers{
-		DriverController: driverController,
+		DriverController:  driverController,
 		VehicleController: vechileController,
 	}
 
 	routes := NewRouter(controllers)
 
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":9090",
 		Handler: routes,
 	}
 
@@ -82,5 +90,8 @@ func main() {
 	if err != nil {
 		zerolog.Fatal().Err(err).Msg("Server Stopped")
 	}
+
+	
+	defer redisClient.Close()
 
 }

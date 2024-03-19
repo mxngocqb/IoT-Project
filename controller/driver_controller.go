@@ -2,8 +2,10 @@ package controller
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/mxngocqb/IoT-Project/cache"
 	"github.com/mxngocqb/IoT-Project/model"
 	"github.com/mxngocqb/IoT-Project/service/driver"
 	"github.com/rs/zerolog/log"
@@ -11,10 +13,11 @@ import (
 
 type DriverController struct {
 	driverService driver.DriverService
+	driverCache   cache.DriverCache
 }
 
-func NewDriverController(driverService driver.DriverService) *DriverController {
-	return &DriverController{driverService: driverService}
+func NewDriverController(driverService driver.DriverService, dc cache.DriverCache) *DriverController {
+	return &DriverController{driverService: driverService, driverCache: dc}
 }
 
 type DriverServerResponse struct {
@@ -53,6 +56,9 @@ func (c *DriverController) CreateDriver(ctx *gin.Context) {
 		"status": "Created",
 		"data":   driver,
 	}
+
+	driverIDString := strconv.Itoa(int(driver.DriverId))
+	c.driverCache.Set(driverIDString, driver)
 
 	ctx.Header("Content-Type", "application/json")
 	ctx.JSON(200, serverReponse)
@@ -100,11 +106,19 @@ func (c *DriverController) ReadAllDriver(ctx *gin.Context) {
 func (c *DriverController) ReadDriverByID(ctx *gin.Context) {
 	log.Info().Msg("Reading Category By ID")
 	driverID := ctx.Param("driverID")
-	driver, err := c.driverService.ReadByID(driverID)
-	if err != nil {
-		ctx.JSON(500, DriverServerResponse{Code: http.StatusInternalServerError, Status: "Internal Server Error", Data: err.Error()})
-		return
+
+	driver := c.driverCache.Get(driverID)
+	var err error
+	if driver == nil {
+		log.Info().Msg("Not cache")
+		driver, err = c.driverService.ReadByID(driverID)
+		c.driverCache.Set(driverID, driver)
+		if err != nil {
+			ctx.JSON(500, DriverServerResponse{Code: http.StatusInternalServerError, Status: "Internal Server Error", Data: err.Error()})
+			return
+		}
 	}
+
 	serverResponse := DriverServerResponse{
 		Code:   http.StatusOK,
 		Status: "OK",
@@ -139,6 +153,8 @@ func (c *DriverController) UpdateDriver(ctx *gin.Context) {
 		return
 	}
 	driver, er := c.driverService.Update(&updateDriver)
+	driverIDString := strconv.Itoa(int(driver.DriverId))
+	c.driverCache.Set(driverIDString, driver)
 	if er != nil {
 		ctx.JSON(500, DriverServerResponse{
 			Code:   http.StatusInternalServerError,
@@ -174,14 +190,25 @@ func (c *DriverController) DeleteDriver(ctx *gin.Context) {
 		ctx.JSON(500, DriverServerResponse{
 			Code:   http.StatusInternalServerError,
 			Status: "Internal Server Error",
-			Data:   "Nothing",
+			Data:   err.Error(),
+		})
+		return
+	}
+
+	err2 := c.driverCache.Delete(DriverID)
+
+	if err2 != nil {
+		ctx.JSON(500, DriverServerResponse{
+			Code:   http.StatusInternalServerError,
+			Status: "Internal Server Error",
+			Data:   err2.Error(),
 		})
 		return
 	}
 	serverResponse := DriverServerResponse{
 		Code:   http.StatusOK,
 		Status: "OK",
-		Data:   "Nnothing",
+		Data:   "OK",
 	}
 	ctx.Header("Content-Type", "application/json")
 	ctx.JSON(200, serverResponse)

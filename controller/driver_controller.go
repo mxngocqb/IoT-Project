@@ -75,7 +75,16 @@ func (c *DriverController) CreateDriver(ctx *gin.Context) {
 // @Router /drivers [get]
 func (c *DriverController) ReadAllDriver(ctx *gin.Context) {
 	log.Info().Msg("Reading All Driver")
-	drivers, err := c.driverService.ReadAll()
+	URLRequest := ctx.Request.URL.String()
+	drivers := c.driverCache.GetMultiRequest(URLRequest)
+	
+	var err error
+	if drivers == nil {
+		drivers, err = c.driverService.ReadAll()	
+		log.Info().Msgf("Not cache")
+		c.driverCache.SetMultiRequest(ctx.Request.URL.String() ,drivers)
+	}
+	
 
 	if err != nil {
 		ctx.JSON(500, gin.H{"error": err.Error()})
@@ -86,7 +95,7 @@ func (c *DriverController) ReadAllDriver(ctx *gin.Context) {
 		Status: "OK",
 		Data:   drivers,
 	}
-
+	
 	ctx.Header("Content-Type", "application/json")
 	ctx.JSON(200, serverResponse)
 }

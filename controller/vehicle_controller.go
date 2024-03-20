@@ -2,8 +2,9 @@ package controller
 
 import (
 	"net/http"
-
+	"strconv"
 	"github.com/gin-gonic/gin"
+	"github.com/mxngocqb/IoT-Project/cache"
 	"github.com/mxngocqb/IoT-Project/model"
 	"github.com/mxngocqb/IoT-Project/service/vehicle"
 	"github.com/rs/zerolog/log"
@@ -11,10 +12,13 @@ import (
 
 type VehicleController struct {
 	vehicleService vehicle.VehicleService
+	vehicleCache  cache.VehicleCache
 }
 
-func NewVehicleController(vehicleService vehicle.VehicleService) *VehicleController {
-	return &VehicleController{vehicleService: vehicleService}
+
+
+func NewVehicleController(vehicleService vehicle.VehicleService, vc cache.VehicleCache) *VehicleController {
+	return &VehicleController{vehicleService: vehicleService, vehicleCache: vc}
 }
 
 type VehicleServerResponse struct {
@@ -64,6 +68,10 @@ func (c *VehicleController) CreateVehicle(ctx *gin.Context) {
 		Data:   vehicle,
 	}
 
+	vehicleIDString := strconv.Itoa(int(vehicle.VehicleId))
+	c.vehicleCache.Set(vehicleIDString, vehicle)
+
+
 	ctx.Header("Content-Type", "application/json")
 	ctx.JSON(200, serverReponse)
 }
@@ -78,7 +86,15 @@ func (c *VehicleController) CreateVehicle(ctx *gin.Context) {
 // @Router /vehicles [get]
 func (c *VehicleController) ReadAllVehicle(ctx *gin.Context) {
 	log.Info().Msg("Reading All Vehicle")
-	vehicles, err := c.vehicleService.ReadAll()
+	URLRequest := ctx.Request.URL.String()
+	vehicles := c.vehicleCache.GetMultiRequest(URLRequest)
+	
+	var err error
+	if vehicles == nil {
+		vehicles, err = c.vehicleService.ReadAll()
+		log.Info().Msgf("Not cache")
+		c.vehicleCache.SetMultiRequest(ctx.Request.URL.String() ,vehicles)
+	}
 
 	if err != nil {
 		ctx.JSON(500, VehicleServerResponse{
@@ -110,7 +126,15 @@ func (c *VehicleController) ReadAllVehicle(ctx *gin.Context) {
 func (c *VehicleController) ReadVehicleByID(ctx *gin.Context) {
 	log.Info().Msg("Reading Category By ID")
 	vehicleID := ctx.Param("vehicleID")
-	vehicle, err := c.vehicleService.ReadByID(vehicleID)
+
+	vehicle := c.vehicleCache.Get(vehicleID)
+	var err error
+
+	if vehicle == nil {
+		log.Info().Msg("Not cache")
+		vehicle, err = c.vehicleService.ReadByID(vehicleID)
+		c.vehicleCache.Set(vehicleID, vehicle)
+	}
 	if err != nil {
 		ctx.JSON(500, VehicleServerResponse{Code: http.StatusInternalServerError, Status: "Internal Server Error", Data: err.Error()})
 		return
@@ -147,7 +171,9 @@ func (c *VehicleController) UpdateVehicle(ctx *gin.Context) {
 		})
 		return
 	}
+	
 	vehicle, er := c.vehicleService.Update(&updateVehicle)
+
 	if er != nil {
 		ctx.JSON(500, VehicleServerResponse{
 			Code:   http.StatusInternalServerError,
@@ -161,6 +187,9 @@ func (c *VehicleController) UpdateVehicle(ctx *gin.Context) {
 		Status: "OK",
 		Data:   vehicle,
 	}
+
+	vehicleIDString := strconv.Itoa(int(vehicle.VehicleId))
+	c.vehicleCache.Set(vehicleIDString, vehicle)
 	ctx.Header("Content-Type", "application/json")
 	ctx.JSON(200, serverResponse)
 }
@@ -183,6 +212,17 @@ func (c *VehicleController) DeleteVehicle(ctx *gin.Context) {
 			Code:   http.StatusInternalServerError,
 			Status: "Internal Server Error",
 			Data:   err.Error(),
+		})
+		return
+	}
+
+	err2 := c.vehicleCache.Delete(VehicleID)
+
+	if err2 != nil {
+		ctx.JSON(500, DriverServerResponse{
+			Code:   http.StatusInternalServerError,
+			Status: "Internal Server Error",
+			Data:   err2.Error(),
 		})
 		return
 	}

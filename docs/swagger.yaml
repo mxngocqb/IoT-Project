@@ -42,7 +42,7 @@ definitions:
     - vehicle_id
     - vehicle_plate
     type: object
-host: 172.18.53.136:8080
+host: 192.168.88.132:9090
 info:
   contact: {}
   description: This is a sample server for the IoT Project API.

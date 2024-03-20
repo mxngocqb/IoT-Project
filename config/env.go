@@ -3,7 +3,8 @@ package config
 import "os"
 
 var (
-	DriverCacheExpirationMs = GetEnv("Driver_CACHE_EXPIRATION_MS", "5000ms")
+	DriverCacheExpirationMs = GetEnv("Driver_CACHE_EXPIRATION_MS", "60000ms")
+	VehicleCacheExpirationMs = GetEnv("Vehicle_CACHE_EXPIRATION_MS", "5000ms")
 )
 
 func GetEnv(key, defaultValue string) string {

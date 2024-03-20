@@ -70,7 +70,8 @@ func main() {
 
 	vehicleRepository := vehicle.NewVehicleRepository(db)
 	vehicleService := vehicleservice.NewVehicleService(vehicleRepository, validate)
-	vechileController := controller.NewVehicleController(vehicleService)
+	vehicleCache := cache.NewVehicleRedisCache(redisClient)
+	vechileController := controller.NewVehicleController(vehicleService, vehicleCache)
 
 	nav_record.NewNavRecordRepository(db)
 
